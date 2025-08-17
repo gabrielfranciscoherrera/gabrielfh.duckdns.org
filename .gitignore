@@ -1,0 +1,51 @@
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de log
+*.log
+logs/
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Archivos de configuración local
+.env
+.env.local
+.env.production
+
+# Dependencias
+node_modules/
+vendor/
+
+# Archivos de caché
+.cache/
+*.cache
+
+# Archivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos de backup
+*.bak
+*.backup
+
+# Archivos de estadísticas
+stats/
+
+# Archivos de errores
+document_errors/
+
+# Archivos privados
+# Se ignoran dependencias generadas dentro de private/
+private/laravel/vendor/
+private/laravel/node_modules/
+private/laravel/storage/*
+!private/laravel/storage/.gitkeep
+private/frontend/node_modules/
+private/frontend/dist/
+private/logs/*
+!private/logs/.gitkeep
