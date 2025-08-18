@@ -1,1 +1,43 @@
 /* public_html/assets/css/app.css */
+
+/* --- Fix Navbar Bootstrap cuando convive con Tailwind --- */
+@media (min-width: 992px) { /* lg */
+  .navbar-expand-lg .navbar-collapse {
+    display: flex !important;      /* fuerza visible en escritorio */
+    flex-basis: auto !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  .navbar-expand-lg .navbar-toggler {
+    display: none !important;       /* oculta hamburguesa en escritorio */
+  }
+}
+
+/* Asegurar que el menú sea visible en laptop */
+.navbar-collapse {
+  flex-basis: auto !important;
+}
+
+.navbar-nav {
+  flex-direction: row !important;
+}
+
+.navbar-nav .nav-item {
+  margin-left: 0.5rem;
+}
+
+/* Evita "estiramiento" de la gráfica */
+.chart-box {
+  position: relative;
+  height: 300px;
+}
+
+/* Debug visual para el menú */
+.navbar {
+  border: 1px solid #dee2e6;
+}
+
+.navbar-collapse {
+  border: 1px solid rgba(255,255,255,0.1);
+}
+  

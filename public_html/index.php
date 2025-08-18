@@ -24,6 +24,10 @@ $router->get('/prestamos', [PrestamosController::class, 'index']);
 $router->get('/prestamos/crear', [PrestamosController::class, 'crear']);
 $router->post('/prestamos', [PrestamosController::class, 'store']);
 
+// Amortización (¡mover arriba del dispatch!)
+$router->get('/prestamos/amortizacion', [PrestamosController::class, 'amortizacion']);
+$router->post('/prestamos/generar-cuotas', [PrestamosController::class, 'generarCuotas']);
+
 // API (JSON)
 $router->get('/api/clientes', [ClientesController::class, 'apiList']);
 $router->post('/api/clientes', [ClientesController::class, 'apiCreate']);
@@ -33,9 +37,5 @@ $router->get('/login', [AuthController::class, 'loginForm']);
 $router->post('/login', [AuthController::class, 'login']);
 $router->post('/logout', [AuthController::class, 'logout']);
 
+// Despacho final
 $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');
-
-
-// Amortización
-$router->get('/prestamos/amortizacion', [PrestamosController::class, 'amortizacion']);
-$router->post('/prestamos/generar-cuotas', [PrestamosController::class, 'generarCuotas']);
