@@ -34,3 +34,8 @@ $router->post('/login', [AuthController::class, 'login']);
 $router->post('/logout', [AuthController::class, 'logout']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');
+
+
+// Amortización
+$router->get('/prestamos/amortizacion', [PrestamosController::class, 'amortizacion']);
+$router->post('/prestamos/generar-cuotas', [PrestamosController::class, 'generarCuotas']);

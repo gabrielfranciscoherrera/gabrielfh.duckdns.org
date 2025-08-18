@@ -6,8 +6,8 @@ use PDO;
 function connect(): PDO {
     $DB_HOST = getenv('DB_HOST') ?: '127.0.0.1';
     $DB_PORT = getenv('DB_PORT') ?: '5432';
-    $DB_NAME = getenv('DB_NAME') ?: 'sistema_prestamos';
-    $DB_USER = getenv('DB_USER') ?: 'postgres';
+    $DB_NAME = getenv('DB_NAME') ?: 'postgres';
+    $DB_USER = getenv('DB_USER') ?: 'gabriel_fh_prestamos';
     $DB_PASS = getenv('DB_PASS') ?: '';
 
     $options = [
