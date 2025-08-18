@@ -3,7 +3,10 @@
 ob_start(); ?>
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h1 class="h4 m-0">Préstamos</h1>
-  <a href="/prestamos/crear" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i>Nuevo préstamo</a>
+  <div class="d-flex gap-2">
+    <a href="/prestamos/crear" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i>Nuevo Préstamo</a>
+    <a href="/clientes" class="btn btn-outline-secondary"><i class="fa-solid fa-users me-2"></i>Gestionar Clientes</a>
+  </div>
 </div>
 <div class="card shadow-sm">
   <div class="card-body p-0">
