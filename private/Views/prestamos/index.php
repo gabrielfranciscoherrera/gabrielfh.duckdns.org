@@ -10,7 +10,7 @@ ob_start(); ?>
     <div class="table-responsive">
       <table class="table table-striped table-hover mb-0">
         <thead class="table-light">
-          <tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Tasa</th><th>Plazo</th></tr>
+          <tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Interés (%)</th><th>Plazo</th><th>Estado</th><th>Fecha</th></tr>
         </thead>
         <tbody>
           <?php foreach (($prestamos ?? []) as $p): ?>
@@ -18,8 +18,10 @@ ob_start(); ?>
             <td><?= htmlspecialchars($p['id']) ?></td>
             <td><?= htmlspecialchars($p['cliente'] ?? '') ?></td>
             <td><?= htmlspecialchars(number_format((float)$p['monto'], 2)) ?></td>
-            <td><?= htmlspecialchars((string)$p['tasa_mensual']) ?></td>
+            <td><?= htmlspecialchars((string)$p['interes']) ?>%</td>
             <td><?= htmlspecialchars((string)$p['plazo_meses']) ?> meses</td>
+            <td><span class="badge bg-<?= $p['estado'] === 'pendiente' ? 'warning' : ($p['estado'] === 'activo' ? 'success' : 'secondary') ?>"><?= htmlspecialchars($p['estado']) ?></span></td>
+            <td><?= htmlspecialchars($p['fecha_inicio'] ?? 'N/A') ?></td>
           </tr>
           <?php endforeach; ?>
         </tbody>
