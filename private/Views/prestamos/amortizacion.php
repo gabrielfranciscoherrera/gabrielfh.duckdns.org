@@ -6,7 +6,7 @@ ob_start(); ?>
     <div class="text-muted small">
       <strong>Cliente:</strong> <?= htmlspecialchars($prestamo['cliente']) ?> ·
       <strong>Monto:</strong> RD$ <?= number_format((float)$prestamo['monto'], 2) ?> ·
-      <strong>Tasa mensual:</strong> <?= $prestamo['tasa_mensual'] ?> ·
+      <strong>Tasa anual:</strong> <?= $prestamo['interes'] ?>% ·
       <strong>Plazo:</strong> <?= (int)$prestamo['plazo_meses'] ?> meses
     </div>
   </div>
@@ -28,11 +28,11 @@ ob_start(); ?>
           <tr><td colspan="6" class="text-center py-4">No hay cuotas generadas.</td></tr>
         <?php else: foreach ($cuotas as $q): ?>
           <tr>
-            <td><?= $q['numero'] ?></td>
-            <td><?= $q['fecha_vencimiento'] ?></td>
-            <td>RD$ <?= number_format($q['capital'],2) ?></td>
-            <td>RD$ <?= number_format($q['interes'],2) ?></td>
-            <td>RD$ <?= number_format($q['total'],2) ?></td>
+            <td><?= $q['numero_cuota'] ?></td>
+            <td><?= $q['fecha_pago'] ?></td>
+            <td>RD$ <?= number_format((float)$q['capital'],2) ?></td>
+            <td>RD$ <?= number_format((float)$q['interes'],2) ?></td>
+            <td>RD$ <?= number_format((float)$q['cuota'],2) ?></td>
             <td><?= $q['pagada'] ? '<span class="badge bg-success">Sí</span>' : '<span class="badge bg-warning text-dark">No</span>' ?></td>
           </tr>
         <?php endforeach; endif; ?>
@@ -40,4 +40,8 @@ ob_start(); ?>
     </table>
   </div>
 </div>
-<?php $content = ob_get_clean(); $title = 'Amortización'; include __DIR__ . '/../layouts/app.php';
+<?php 
+$content = ob_get_clean(); 
+$title = 'Amortización'; 
+include __DIR__ . '/../layouts/app.php';
+?>
