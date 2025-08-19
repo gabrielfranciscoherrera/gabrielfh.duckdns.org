@@ -21,7 +21,7 @@ ob_start(); ?>
             <select class="form-select" id="cliente_id" name="cliente_id" required>
               <option value="">Seleccionar cliente...</option>
               <?php foreach (($clientes ?? []) as $cliente): ?>
-                <option value="<?= $cliente['id'] ?>"><?= htmlspecialchars($cliente['nombre']) ?> - <?= htmlspecialchars($cliente['identificacion'] ?? '') ?></option>
+                <option value="<?= $cliente['id'] ?>"><?= htmlspecialchars($cliente['nombre']) ?> - <?= htmlspecialchars($cliente['cedula'] ?? '') ?></option>
               <?php endforeach; ?>
             </select>
           </div>

@@ -17,7 +17,7 @@ class PrestamosController {
         global $pdo;
         
         // Cargar clientes para el select
-        $stmt = $pdo->query("SELECT id, nombre, identificacion FROM clientes ORDER BY nombre");
+        $stmt = $pdo->query("SELECT id, nombre, cedula FROM clientes ORDER BY nombre");
         $clientes = $stmt->fetchAll();
         
         // Cargar empresas para el select
