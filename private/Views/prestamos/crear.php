@@ -200,4 +200,8 @@ document.getElementById('formPrestamo').addEventListener('submit', function(e) {
 });
 </script>
 
-<?php $content = ob_get_clean(); ?>
+<?php 
+$content = ob_get_clean(); 
+$title = 'Crear préstamo';
+include __DIR__ . '/../layouts/app.php';
+?>

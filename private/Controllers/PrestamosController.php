@@ -24,7 +24,6 @@ class PrestamosController {
         $stmt = $pdo->query("SELECT id, nombre FROM empresas ORDER BY nombre");
         $empresas = $stmt->fetchAll();
         
-        $title = 'Crear préstamo';
         include __DIR__ . '/../Views/prestamos/crear.php';
     }
     
