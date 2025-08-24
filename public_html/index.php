@@ -39,3 +39,28 @@ $router->post('/logout', [AuthController::class, 'logout']);
 
 // Despacho final
 $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');
+
+
+/**
+ * Front Controller del sistema (public_html/index.php).
+ *
+ * Este archivo centraliza todas las peticiones entrantes al servidor
+ * y las redirige al controlador correspondiente mediante el enrutador.
+ *
+ * Flujo principal:
+ * 1. Configura la visualización de errores y el nivel de reporte (desarrollo/producción).
+ * 2. Define la constante BASE_PATH para ubicar correctamente los recursos del proyecto.
+ * 3. Carga el bootstrap de la aplicación para inicializar dependencias y configuraciones.
+ * 4. Crea una instancia del Router.
+ * 5. Registra las rutas disponibles, separadas en secciones:
+ *    - Web (HTML): rutas para vistas principales de clientes y préstamos.
+ *    - Amortización: rutas específicas para generación de cuotas.
+ *    - API (JSON): endpoints para manejar datos vía JSON (ej. clientes).
+ *    - Auth: rutas de autenticación (login, logout).
+ * 6. Ejecuta el método dispatch() para resolver la ruta solicitada,
+ *    en función del método HTTP y la URI recibida.
+ *
+ * En resumen:
+ * Este archivo actúa como el punto de entrada único de la aplicación,
+ * asegurando un control centralizado de las solicitudes y respuestas.
+ */
