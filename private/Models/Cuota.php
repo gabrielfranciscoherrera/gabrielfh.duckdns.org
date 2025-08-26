@@ -1,67 +1,73 @@
 <?php
+
 namespace Models;
-use PDO;
-use DateTime;
-use DateInterval;
 
-class Cuota {
-    public static function byPrestamo(int $prestamo_id): array {
-        global $pdo; /** @var PDO $pdo */
-        $stmt = $pdo->prepare("SELECT id, numero_cuota, fecha_pago, capital, interes, cuota, saldo, pagada
-                               FROM cuotas WHERE prestamo_id = :id ORDER BY numero_cuota ASC");
-        $stmt->execute([':id' => $prestamo_id]);
-        return $stmt->fetchAll() ?: [];
-    }
+class Cuota
+{
+    /**
+     * Genera la tabla de amortización para un préstamo.
+     *
+     * @param \PDO $pdo La conexión a la base de datos.
+     * @param array $p Los datos del préstamo.
+     */
+    public static function generarParaPrestamo(\PDO $pdo, array $p): void
+    {
+        // Limpiar cuotas anteriores si existen para este préstamo
+        $pdo->prepare("DELETE FROM amortizaciones WHERE prestamo_id = :pid")->execute([':pid' => $p['id']]);
 
-    public static function generarParaPrestamo(int $prestamo_id): array {
-        global $pdo; /** @var PDO $pdo */
-        $stmt = $pdo->prepare("SELECT id, monto, interes, plazo_meses, fecha_inicio FROM prestamos WHERE id = :id");
-        $stmt->execute([':id' => $prestamo_id]);
-        $p = $stmt->fetch();
-        if (!$p) { return ['ok' => false, 'msg' => 'Préstamo no encontrado']; }
-
+        // Datos del préstamo
         $P = (float)$p['monto'];
-        $r = (float)$p['interes'] / 100; // Convertir porcentaje a decimal
         $n = (int)$p['plazo_meses'];
-        $fecha = new DateTime($p['fecha_inicio']);
+        
+        // --- LÓGICA MEJORADA ---
+        // 1. Asumimos que el interés guardado en la BD es ANUAL.
+        //    Ej: Si se guarda 24, representa 24% anual.
+        $tasa_anual = (float)$p['interes'] / 100;
+        $r = $tasa_anual / 12; // Tasa de interés mensual efectiva
 
-        if ($P <= 0 || $n <= 0) {
-            return ['ok' => false, 'msg' => 'Datos inválidos'];
-        }
+        // Fórmula de la cuota fija (Sistema de Amortización Francés)
+        // Se calcula una sola vez
+        $A = $P * ($r * pow(1 + $r, $n)) / (pow(1 + $r, $n) - 1);
+        
+        $saldo = $P;
+        $fecha_pago = new \DateTime($p['fecha_primer_pago']);
 
-        // Sistema francés
-        $A = ($r > 0) ? $P * ($r / (1 - pow(1 + $r, -$n))) : $P / $n;
+        $stmt = $pdo->prepare(
+            "INSERT INTO amortizaciones (prestamo_id, empresa_id, numero_cuota, fecha_pago, capital, interes, total_cuota, saldo_pendiente, estado) 
+             VALUES (:pid, :eid, :ncu, :fp, :cap, :int, :tot, :saldo, 'pendiente')"
+        );
 
-        $pdo->beginTransaction();
-        try {
-            $pdo->prepare("DELETE FROM cuotas WHERE prestamo_id = :id")->execute([':id' => $prestamo_id]);
+        for ($k = 1; $k <= $n; $k++) {
+            // --- CÁLCULOS PRECISOS ---
+            $interes_calculado = $saldo * $r;
+            $capital_calculado = $A - $interes_calculado;
+            $saldo_anterior = $saldo;
+            $saldo -= $capital_calculado;
 
-            $saldo = $P;
-            for ($k = 1; $k <= $n; $k++) {
-                $interes = ($r > 0) ? $saldo * $r : 0.0;
-                $capital = $A - $interes;
-                if ($k == $n) { $capital = $saldo; $A = $capital + $interes; }
-                $saldo -= $capital;
-
-                $fecha_venc = (clone $fecha)->add(new DateInterval('P' . ($k - 1) . 'M'))->format('Y-m-d');
-
-                $pdo->prepare("INSERT INTO cuotas (prestamo_id, numero_cuota, fecha_pago, capital, interes, cuota, saldo, pagada)
-                               VALUES (:pid, :num, :fec, :cap, :int, :tot, :saldo, false)")
-                    ->execute([
-                        ':pid' => $prestamo_id,
-                        ':num' => $k,
-                        ':fec' => $fecha_venc,
-                        ':cap' => round($capital, 2),
-                        ':int' => round($interes, 2),
-                        ':tot' => round($A, 2),
-                        ':saldo' => round($saldo, 2),
-                    ]);
+            // 2. AJUSTE DE LA ÚLTIMA CUOTA
+            // Para asegurar que el saldo final sea exactamente 0, ajustamos la última cuota.
+            if ($k == $n) {
+                // Si queda un pequeño saldo residual por el redondeo de los decimales,
+                // se lo sumamos al capital de la última cuota.
+                $capital_calculado += $saldo;
+                $A = $capital_calculado + $interes_calculado; // Recalculamos el total de la cuota final
+                $saldo = 0; // Forzamos el saldo a cero
             }
-            $pdo->commit();
-            return ['ok' => true, 'msg' => 'Cuotas generadas'];
-        } catch (\Throwable $e) {
-            $pdo->rollBack();
-            return ['ok' => false, 'msg' => 'Error generando cuotas'];
+
+            $stmt->execute([
+                ':pid' => $p['id'],
+                ':eid' => $p['empresa_id'],
+                ':ncu' => $k,
+                ':fp' => $fecha_pago->format('Y-m-d'),
+                // 3. REDONDEO SOLO AL GUARDAR
+                ':cap' => round($capital_calculado, 2),
+                ':int' => round($interes_calculado, 2),
+                ':tot' => round($A, 2),
+                ':saldo' => round($saldo, 2)
+            ]);
+
+            // Avanzar al siguiente mes para la próxima cuota
+            $fecha_pago->add(new \DateInterval('P1M'));
         }
     }
 }
